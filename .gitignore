@@ -3,3 +3,4 @@ dist
 cache-test.ts
 bedrock-claude-test.ts
 test/
+*.tgz
