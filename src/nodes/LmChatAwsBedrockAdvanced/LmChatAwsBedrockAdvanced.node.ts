@@ -404,6 +404,8 @@ export class LmChatAwsBedrockAdvanced implements INodeType {
 							completionTokens: usageMeta.output_tokens ?? 0,
 							promptTokens: usageMeta.input_tokens ?? 0,
 							totalTokens: usageMeta.total_tokens ?? 0,
+							cacheReadInputTokens: cacheRead,
+							cacheWriteInputTokens: cacheWrite,
 						},
 					};
 				}
@@ -521,7 +523,20 @@ export class LmChatAwsBedrockAdvanced implements INodeType {
 			region: credentials.region,
 			temperature: options.temperature,
 			maxTokens: options.maxTokensToSample,
-			callbacks: [new N8nLlmTracing(this) as any],
+			callbacks: [new N8nLlmTracing(this, {
+				tokensUsageParser: (result: any) => {
+					const usage = result?.llmOutput?.tokenUsage ?? {};
+					const completionTokens = usage.completionTokens ?? 0;
+					const promptTokens = usage.promptTokens ?? 0;
+					return {
+						completionTokens,
+						promptTokens,
+						totalTokens: completionTokens + promptTokens,
+						cacheReadInputTokens: usage.cacheReadInputTokens ?? 0,
+						cacheWriteInputTokens: usage.cacheWriteInputTokens ?? 0,
+					};
+				},
+			}) as any],
 			onFailedAttempt: makeN8nLlmFailedAttemptHandler(this),
 		});
 

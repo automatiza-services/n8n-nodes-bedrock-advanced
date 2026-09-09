@@ -326,6 +326,8 @@ export class ChatBedrockClaude extends BaseChatModel {
 					completionTokens: usage.output_tokens ?? 0,
 					promptTokens: usage.input_tokens ?? 0,
 					totalTokens: (usage.input_tokens ?? 0) + (usage.output_tokens ?? 0),
+					cacheReadInputTokens: usage.cache_read_input_tokens ?? 0,
+					cacheWriteInputTokens: usage.cache_creation_input_tokens ?? 0,
 				},
 			},
 		};
@@ -372,6 +374,8 @@ export class ChatBedrockClaude extends BaseChatModel {
 						completionTokens: usageMeta.output_tokens ?? 0,
 						promptTokens: usageMeta.input_tokens ?? 0,
 						totalTokens: usageMeta.total_tokens ?? 0,
+						cacheReadInputTokens: usageMeta.input_token_details?.cache_read ?? 0,
+						cacheWriteInputTokens: usageMeta.input_token_details?.cache_creation ?? 0,
 					},
 				} : {}),
 			},

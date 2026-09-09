@@ -431,7 +431,20 @@ export class LmChatBedrockClaude implements INodeType {
 			debugLog: options.enableDebugLogs ?? false,
 			logger,
 			builtInTools,
-			callbacks: [new N8nLlmTracing(this) as any],
+			callbacks: [new N8nLlmTracing(this, {
+				tokensUsageParser: (result: any) => {
+					const usage = result?.llmOutput?.tokenUsage ?? {};
+					const completionTokens = usage.completionTokens ?? 0;
+					const promptTokens = usage.promptTokens ?? 0;
+					return {
+						completionTokens,
+						promptTokens,
+						totalTokens: completionTokens + promptTokens,
+						cacheReadInputTokens: usage.cacheReadInputTokens ?? 0,
+						cacheWriteInputTokens: usage.cacheWriteInputTokens ?? 0,
+					};
+				},
+			}) as any],
 			onFailedAttempt: makeN8nLlmFailedAttemptHandler(this),
 		});
 
